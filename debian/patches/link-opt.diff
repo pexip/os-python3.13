@@ -1,0 +1,29 @@
+Description: Call the linker with -O1 -Bsymbolic-functions
+ We do symbolic-functions as policy in Ubuntu.
+
+ Could be forwarded in the form of a configure flag.
+
+Forwarded: no
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -3495,8 +3495,8 @@
+ 		LDSHARED='$(CC) -shared'
+ 		LDCXXSHARED='$(CXX) -shared';;
+ 	Linux*|GNU*|QNX*|VxWorks*|Haiku*)
+-		LDSHARED='$(CC) -shared'
+-		LDCXXSHARED='$(CXX) -shared';;
++		LDSHARED='$(CC) -shared -Wl,-O1 -Wl,-Bsymbolic-functions'
++		LDCXXSHARED='$(CXX) -shared -Wl,-O1 -Wl,-Bsymbolic-functions';;
+ 	FreeBSD*)
+ 		if [[ "`$CC -dM -E - </dev/null | grep __ELF__`" != "" ]]
+ 		then
+@@ -3608,7 +3608,7 @@
+ 	    LINKFORSHARED="-Wl,-E -Wl,+s";;
+ #	    LINKFORSHARED="-Wl,-E -Wl,+s -Wl,+b\$(BINLIBDEST)/lib-dynload";;
+ 	Linux-android*) LINKFORSHARED="-pie -Xlinker -export-dynamic";;
+-	Linux*|GNU*) LINKFORSHARED="-Xlinker -export-dynamic";;
++	Linux*|GNU*) LINKFORSHARED="-Xlinker -export-dynamic -Wl,-O1 -Wl,-Bsymbolic-functions";;
+ 	# -u libsys_s pulls in all symbols in libsys
+ 	Darwin/*|iOS/*)
+ 		LINKFORSHARED="$extra_undefs -framework CoreFoundation"

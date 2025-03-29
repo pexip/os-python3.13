@@ -1,0 +1,4 @@
+lib@PVER@ binary: package-name-doesnt-match-sonames
+
+# pyexpat.c contains expat error messages that lintian mis-attributes to embedding
+lib@PVER@ binary: embedded-library

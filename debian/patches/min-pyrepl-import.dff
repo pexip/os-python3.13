@@ -1,0 +1,15 @@
+Description: _pyrepl (and its dependencies) are not shipped in -minimal
+ Fall back to the basic REPL.
+Forwarded: not-needed
+--- a/Modules/main.c
++++ b/Modules/main.c
+@@ -567,7 +567,8 @@
+     }
+ 
+     if (!isatty(fileno(stdin))
+-        || _Py_GetEnv(config->use_environment, "PYTHON_BASIC_REPL")) {
++        || _Py_GetEnv(config->use_environment, "PYTHON_BASIC_REPL")
++        || PyImport_ImportModule("_pyrepl") == NULL) {
+         PyCompilerFlags cf = _PyCompilerFlags_INIT;
+         int run = PyRun_AnyFileExFlags(stdin, "<stdin>", 0, &cf);
+         return (run != 0);

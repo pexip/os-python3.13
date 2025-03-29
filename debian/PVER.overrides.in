@@ -1,0 +1,14 @@
+# yes, we have to
+@PVER@ binary: depends-on-python-minimal
+
+@PVER@ binary: desktop-command-not-in-package
+@PVER@ binary: menu-command-not-in-package
+@PVER@ binary: unusual-interpreter
+@PVER@ binary: python3-script-but-no-python3-dep
+
+# no, not useless
+@PVER@ binary: manpage-has-useless-whatis-entry
+
+@PVER@ binary: command-with-path-in-maintainer-script
+
+@PVER@ binary: python3-script-but-no-python3-dep [usr/bin/pygettext@VER@]

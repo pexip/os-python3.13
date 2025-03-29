@@ -1,0 +1,14 @@
+# generated during the build
+quilt-build-dep-but-no-series-file
+
+# in the source only, and can be built with mingw64
+source-contains-prebuilt-windows-binary
+
+# expected, diverted
+binaries-have-file-conflict
+
+# these are generated, and one is a test case
+# E: python3.13 source: source-is-missing [Lib/idlelib/help.html]
+# E: python3.13 source: source-is-missing [Lib/test/test_difflib_expect.html]
+# E: python3.13 source: source-is-missing [debian/FAQ.html]
+source-is-missing

@@ -1,0 +1,17 @@
+Description: Keep the lib-dynload dir in the same place when configuring with
+ --libdir=/usr/lib/$(DEB_HOST_MULTIARCH)
+ The C extensions already have multiarch paths in their filenames.
+
+Forwarded: no
+
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -169,7 +169,7 @@
+ LDSHARED=	@LDSHARED@ $(PY_LDFLAGS)
+ BLDSHARED=	@BLDSHARED@ $(PY_CORE_LDFLAGS)
+ LDCXXSHARED=	@LDCXXSHARED@ $(PY_LDFLAGS)
+-DESTSHARED=	$(BINLIBDEST)/lib-dynload
++DESTSHARED=	$(LIBDEST)/lib-dynload
+ 
+ # List of exported symbols for AIX
+ EXPORTSYMS=	@EXPORTSYMS@

@@ -1,0 +1,34 @@
+Description: Suggest installation of python3-tk package
+ We split Tk out into a separate binary package. Help users who try to import
+ it, without it installed.
+
+Forwarded: not-needed
+
+--- a/Lib/tkinter/__init__.py
++++ b/Lib/tkinter/__init__.py
+@@ -35,7 +35,10 @@
+ import sys
+ import types
+ 
+-import _tkinter # If this fails your Python may not be configured for Tk
++try:
++    import _tkinter
++except ImportError as msg:
++    raise ImportError(str(msg) + ', please install the python3-tk package')
+ TclError = _tkinter.TclError
+ from tkinter.constants import *
+ import re
+--- a/Lib/turtle.py
++++ b/Lib/turtle.py
+@@ -98,7 +98,10 @@
+ extensions in mind. These will be commented and documented elsewhere.
+ """
+ 
+-import tkinter as TK
++try:
++    import tkinter as TK
++except ImportError as msg:
++    raise ImportError(str(msg) + ', please install the python3-tk package')
+ import types
+ import math
+ import time

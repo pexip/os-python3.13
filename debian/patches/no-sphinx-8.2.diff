@@ -1,0 +1,11 @@
+--- a/Doc/conf.py
++++ b/Doc/conf.py
+@@ -92,7 +92,7 @@ highlight_language = 'python3'
+ 
+ # Minimum version of sphinx required
+ # Keep this version in sync with ``Doc/requirements.txt``.
+-needs_sphinx = '8.2.0'
++needs_sphinx = '8.1.3'
+ 
+ # Create table of contents entries for domain objects (e.g. functions, classes,
+ # attributes, etc.). Default is True.

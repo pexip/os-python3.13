@@ -1,0 +1,7 @@
+# yes, we have to
+@PVER@-nopie binary: depends-on-python-minimal
+
+# pyexpat.c contains expat error messages that lintian mis-attributes to embedding
+@PVER@-nopie binary: embedded-library
+
+@PVER@-nopie binary: unknown-field

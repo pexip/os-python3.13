@@ -1,0 +1,30 @@
+Description: Debian: Don't autodetect whether semephores are present
+ Assume working semaphores, don't rely on running kernel for the check.
+
+ This is not something that's approriate for us to detect at build time.
+ Potentially forwadable, if redesigned.
+
+Forwarded: not-needed
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -6017,10 +6017,15 @@
+   [ac_cv_posix_semaphores_enabled=yes])
+ )
+ AS_VAR_IF([ac_cv_posix_semaphores_enabled], [no], [
+-  AC_DEFINE(
+-    [POSIX_SEMAPHORES_NOT_ENABLED], [1],
+-    [Define if POSIX semaphores aren't enabled on your system]
+-  )
++  case $ac_sys_system in
++    Linux*) # assume yes, see https://launchpad.net/bugs/630511
++      ;;
++    *)
++      AC_DEFINE(
++        [POSIX_SEMAPHORES_NOT_ENABLED], [1],
++        [Define if POSIX semaphores aren't enabled on your system]
++      )
++  esac
+ ])
+ 
+ dnl Multiprocessing check for broken sem_getvalue

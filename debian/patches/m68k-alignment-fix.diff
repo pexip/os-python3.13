@@ -1,0 +1,16 @@
+Description: Enforce 4-byte alignment on m68k
+ This should be temporary as Debian plans to switch the port to 4-byte alignment.
+Author: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Bug-Debian: https://bugs.debian.org/1087600
+Forwarded: not-needed
+--- a/Include/internal/pycore_gc.h
++++ b/Include/internal/pycore_gc.h
+@@ -19,7 +19,7 @@ typedef struct {
+     // Pointer to previous object in the list.
+     // Lowest two bits are used for flags documented later.
+     uintptr_t _gc_prev;
+-} PyGC_Head;
++} PyGC_Head Py_ALIGNED(sizeof(uintptr_t));
+ 
+ #define _PyGC_Head_UNUSED PyGC_Head
+ 
