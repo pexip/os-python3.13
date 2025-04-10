@@ -1,5 +1,5 @@
-git-updates.diff
-patchlevel-noplus.diff
+#git-updates.diff
+#patchlevel-noplus.diff
 deb-locations.diff
 distutils-install-layout.diff
 sysconfig-debian-schemes.diff
@@ -27,3 +27,4 @@ m68k-alignment-fix.diff
 issue127330.diff
 no-sphinx-8.2.diff
 man-page-fixes.diff
+no-wheel-whl.diff

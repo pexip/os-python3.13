@@ -20,8 +20,7 @@ Build-Depends: debhelper (>= 11), dpkg-dev (>= 1.17.11),
   media-types | mime-support, netbase, bzip2, time, python3:any, python3.13:any <cross>,
   net-tools,
   python3-pip-whl <!nocheck>,
-  python3-setuptools-whl <!nocheck>,
-  python3-wheel-whl <!nocheck>,
+  python3-setuptools-whl (>= 70.1) <!nocheck>,
   xvfb <!nocheck>, xauth <!nocheck>,
   tzdata <!nocheck>,
   systemtap-sdt-dev [!hurd-amd64 !hurd-i386],
@@ -59,7 +58,7 @@ Multi-Arch: allowed
 Priority: optional
 Depends: python3.13 (= ${binary:Version}),
  python3-pip-whl (>= 22.2),
- python3-setuptools-whl,
+ python3-setuptools-whl (>= 70.1),
  ${shlibs:Depends}, ${misc:Depends},
 Breaks: python3-pip (<< 1.5.6-4)
 Description: Interactive high-level object-oriented language (pyvenv binary, version 3.13)
