@@ -1,0 +1,74 @@
+diff --git a/Lib/json/__init__.py b/Lib/json/__init__.py
+index ed2c747..547a4fd 100644
+--- a/Lib/json/__init__.py
++++ b/Lib/json/__init__.py
+@@ -338,7 +338,8 @@ def loads(s, *, cls=None, object_hook=None, parse_float=None,
+         if not isinstance(s, (bytes, bytearray)):
+             raise TypeError(f'the JSON object must be str, bytes or bytearray, '
+                             f'not {s.__class__.__name__}')
+-        s = s.decode(detect_encoding(s), 'surrogatepass')
++        enc = detect_encoding(s)
++        s = s.decode(enc, 'strict' if enc.startswith("utf-8") else 'replace')
+ 
+     if (cls is None and object_hook is None and
+             parse_int is None and parse_float is None and
+diff --git a/Lib/json/decoder.py b/Lib/json/decoder.py
+index c5d9ae2..627a60e 100644
+--- a/Lib/json/decoder.py
++++ b/Lib/json/decoder.py
+@@ -121,6 +121,8 @@ def py_scanstring(s, end, strict=True,
+                 if 0xdc00 <= uni2 <= 0xdfff:
+                     uni = 0x10000 + (((uni - 0xd800) << 10) | (uni2 - 0xdc00))
+                     end += 6
++            if 0xd800 <= uni <= 0xdfff:
++                uni = 0xfffd
+             char = chr(uni)
+         _append(char)
+     return ''.join(chunks), end
+diff --git a/Lib/test/test_json/test_scanstring.py b/Lib/test/test_json/test_scanstring.py
+index 2d3ee8a..65d95e7 100644
+--- a/Lib/test/test_json/test_scanstring.py
++++ b/Lib/test/test_json/test_scanstring.py
+@@ -91,15 +91,15 @@ class TestScanstring:
+             self.assertEqual(scanstring(given, 1, True),
+                              (expect, len(given)))
+ 
+-        assertScan('"z\\ud834\\u0079x"', 'z\ud834yx')
++        assertScan('"z\\ud834\\u0079x"', 'z\ufffdyx')
+         assertScan('"z\\ud834\\udd20x"', 'z\U0001d120x')
+-        assertScan('"z\\ud834\\ud834\\udd20x"', 'z\ud834\U0001d120x')
+-        assertScan('"z\\ud834x"', 'z\ud834x')
+-        assertScan('"z\\ud834\udd20x12345"', 'z\ud834\udd20x12345')
+-        assertScan('"z\\udd20x"', 'z\udd20x')
+-        assertScan('"z\ud834\udd20x"', 'z\ud834\udd20x')
+-        assertScan('"z\ud834\\udd20x"', 'z\ud834\udd20x')
+-        assertScan('"z\ud834x"', 'z\ud834x')
++        assertScan('"z\\ud834\\ud834\\udd20x"', 'z\ufffd\U0001d120x')
++        assertScan('"z\\ud834x"', 'z\ufffdx')
++        assertScan('"z\\ud834\udd20x12345"', 'z\ufffd\udd20x12345')
++        assertScan('"z\\udd20x"', 'z\ufffdx')
++        assertScan('"z\ud834\udd20x"', 'z\ud834\udd20x')
++        assertScan('"z\ud834\\udd20x"', 'z\ud834\ufffdx')
++        assertScan('"z\ud834x"', 'z\ud834x')
+ 
+     def test_bad_escapes(self):
+         scanstring = self.json.decoder.scanstring
+diff --git a/Modules/_json.c b/Modules/_json.c
+index 9464b9f..3e0e447 100644
+--- a/Modules/_json.c
++++ b/Modules/_json.c
+@@ -537,6 +537,14 @@ scanstring_unicode(PyObject *pystr, Py_ssize_t end, int strict, Py_ssize_t *next
+                 else
+                     end -= 6;
+             }
++            /* Bare surrogate */
++            if (Py_UNICODE_IS_SURROGATE(c)) {
++                /*if (strict) {
++                    raise_errmsg("Invalid bare surrogate at", pystr, end - 5);
++                    goto bail;
++                }*/
++                c = Py_UNICODE_REPLACEMENT_CHARACTER;
++            }
+         }
+         if (_PyUnicodeWriter_WriteChar(&writer, c) < 0) {
+             goto bail;

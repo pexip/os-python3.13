@@ -1,7 +1,11 @@
-# install the apport exception handler if available
+import site
+import sys
+
+site.addsitedir('/opt/pexip/lib/python{}.{}/site-packages'.format(*sys.version_info[:2]))
+
 try:
-    import apport_python_hook
+    from pexplatform.sitecustomize import install_handlers
 except ImportError:
     pass
 else:
-    apport_python_hook.install()
+    install_handlers()

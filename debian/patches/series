@@ -27,3 +27,7 @@ m68k-alignment-fix.diff
 issue127330.diff
 no-sphinx-8.2.diff
 man-page-fixes.diff
+pexip-md5-security.patch
+pexip-openssl3-deprecations.diff
+pexip_native-md5.diff
+pexip-json.diff
