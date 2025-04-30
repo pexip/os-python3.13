@@ -111,8 +111,8 @@ Index: python3.13/Modules/_hashopenssl.c
 -    ctx = HMAC_CTX_new();
 +    mac = EVP_MAC_fetch(NULL, "HMAC", NULL);
 +    if (mac == NULL) {
-+        _setException(PyExc_ValueError, NULL);
-+       goto error;
++        notify_ssl_error_occurred();
++        goto error;
 +    }
 +
 +    ctx = EVP_MAC_CTX_new(mac);
