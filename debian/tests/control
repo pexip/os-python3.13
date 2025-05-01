@@ -9,7 +9,6 @@ Depends: build-essential,
   idle-python3.13,
   systemtap-sdt-dev,
   python3.13-venv,
-  python3-wheel-whl,
 # need to turn off apport
 Restrictions: needs-root, allow-stderr
 
@@ -23,7 +22,6 @@ Depends: build-essential,
   idle-python3.13,
   systemtap-sdt-dev,
   python3.13-venv,
-  python3-wheel-whl,
 # need to turn off apport
 Restrictions: needs-root, allow-stderr
 
@@ -71,8 +69,7 @@ Tests: module-install-venv
 Depends: build-essential,
   python3.13-dev,
   python3.13-venv,
-  python3-setuptools-whl,
-  python3-wheel-whl,
+  python3-setuptools-whl (>= 70.1),
   shunit2
 Restrictions: allow-stderr
 
@@ -81,6 +78,5 @@ Depends: build-essential,
   python3.13-dev,
   shunit2,
   virtualenv,
-  python3-setuptools-whl,
-  python3-wheel-whl
+  python3-setuptools-whl (>= 70.1)
 Restrictions: allow-stderr

@@ -40,7 +40,7 @@ This adds two schemes:
      'posix_home': {
          'stdlib': '{installed_base}/lib/{implementation_lower}',
          'platstdlib': '{base}/lib/{implementation_lower}',
-@@ -230,7 +254,7 @@
+@@ -237,7 +261,7 @@
  _PYTHON_BUILD = is_python_build()
  
  if _PYTHON_BUILD:
@@ -49,7 +49,7 @@ This adds two schemes:
          # On POSIX-y platforms, Python will:
          # - Build from .h files in 'headers' (which is only added to the
          #   scheme when building CPython)
-@@ -291,8 +315,19 @@
+@@ -298,8 +322,19 @@
              'user': 'osx_framework_user',
          }
  
@@ -70,7 +70,7 @@ This adds two schemes:
          'home': 'posix_home',
          'user': 'posix_user',
      }
-@@ -424,7 +459,7 @@
+@@ -431,7 +466,7 @@
          else:
              inc_dir = _PROJECT_BASE
      else:
