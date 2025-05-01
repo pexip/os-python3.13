@@ -1,3 +1,9 @@
+python3.13 (3.13.3-2+pexip25u1) pexip-trixie; urgency=medium
+
+  * New upstream release.
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Thu, 01 May 2025 23:13:08 +0100
+
 python3.13 (3.13.3-2) unstable; urgency=medium
 
   * Drop depends and test depends on python3-wheel-whl, setuptools has native
