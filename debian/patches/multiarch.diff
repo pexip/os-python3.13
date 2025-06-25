@@ -7,7 +7,7 @@ Forwarded: no
 
 --- a/Lib/sysconfig/__init__.py
 +++ b/Lib/sysconfig/__init__.py
-@@ -545,6 +545,12 @@ def _init_config_vars():
+@@ -545,6 +545,12 @@
      # e.g., 't' for free-threaded or '' for default build
      _CONFIG_VARS['abi_thread'] = 't' if _CONFIG_VARS.get('Py_GIL_DISABLED') else ''
  
@@ -22,7 +22,7 @@ Forwarded: no
      if os.name == 'posix':
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -1733,6 +1733,7 @@ Python/interpconfig.o: $(srcdir)/Python/
+@@ -1738,6 +1738,7 @@
  
  Python/dynload_shlib.o: $(srcdir)/Python/dynload_shlib.c Makefile
  	$(CC) -c $(PY_CORE_CFLAGS) \

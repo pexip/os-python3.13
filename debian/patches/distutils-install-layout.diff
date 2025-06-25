@@ -34,7 +34,7 @@ Forwarded: not-needed
  If a file named "pyvenv.cfg" exists one directory above sys.executable,
  sys.prefix and sys.exec_prefix are set to that directory and
  it is also checked for site-packages (sys.base_prefix and
-@@ -387,6 +393,8 @@
+@@ -388,6 +394,8 @@
      if prefixes is None:
          prefixes = PREFIXES
  
@@ -43,7 +43,7 @@ Forwarded: not-needed
      for prefix in prefixes:
          if not prefix or prefix in seen:
              continue
-@@ -403,10 +411,21 @@
+@@ -404,10 +412,21 @@
              if sys.platlibdir != "lib":
                  libdirs.append("lib")
  

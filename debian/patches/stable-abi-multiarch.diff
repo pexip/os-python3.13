@@ -23,7 +23,7 @@ Bug-Upstream: https://github.com/python/cpython/issues/122931
 
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -1735,6 +1735,7 @@
+@@ -1740,6 +1740,7 @@
  	$(CC) -c $(PY_CORE_CFLAGS) \
  		$(if $(MULTIARCH),-DMULTIARCH='"$(MULTIARCH)"') \
  		-DSOABI='"$(SOABI)"' \

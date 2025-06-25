@@ -1,5 +1,6 @@
-Description: Updates from the 3.13 branch (until 2025-03-29).
+Description: Updates from the 3.13 branch (until 2025-05-21).
  We pick the latest updates from the maintainance branch, and carry them in a
  patch, rather than creating and uploading uploading a new .orig tarball.
 
-# git diff --no-renames 4f8bb3947cfbc20f970ff9d9531e1132a9e95396 9ffa80f21edcfec5092388b8b7f3cc7dd29692bb | filterdiff -x ?/.hgignore -x ?/.hgeol -x ?/.hgtags -x ?/.hgtouch -x ?/.gitignore -x ?/.gitattributes -x '?/.github/*' -x '?/.git*' -x ?/.codecov.yml -x ?/.travis.yml -x ?/configure --remove-timestamps
+# git diff --no-renames 6280bb547840b609feedb78887c6491af75548e8 7ada439712871b893bc669971e154b4b4fe15915 | filterdiff -x ?/.hgignore -x ?/.hgeol -x ?/.hgtags -x ?/.hgtouch -x ?/.gitignore -x ?/.gitattributes -x '?/.github/*' -x '?/.git*' -x ?/.codecov.yml -x ?/.travis.yml -x ?/configure --remove-timestamps
+

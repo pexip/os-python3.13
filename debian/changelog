@@ -1,3 +1,46 @@
+python3.13 (3.13.5-2) unstable; urgency=medium
+
+  * Patch: Revert disabling of logger while handling log record.
+
+ -- Stefano Rivera <stefanor@debian.org>  Wed, 25 Jun 2025 20:55:22 +0200
+
+python3.13 (3.13.5-1) unstable; urgency=medium
+
+  * Python 3.13.5.
+  * Refresh patches.
+  * Drop patch no-wheel-whl.diff, superseded upstream.
+  * Replace m68k-alignment-fix.diff with gchead-alignment.diff, the patch that
+    landed upstream.
+
+ -- Stefano Rivera <stefanor@debian.org>  Thu, 12 Jun 2025 09:03:44 +0200
+
+python3.13 (3.13.4-1) unstable; urgency=medium
+
+  * Python 3.13.4.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 03 Jun 2025 21:15:26 +0200
+
+python3.13 (3.13.3-4) unstable; urgency=medium
+
+  * Update to the 3.13 branch 2025-05-21.
+    - Fix gh-133767, CVE-2025-4516.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 21 May 2025 09:49:52 +0200
+
+python3.13 (3.13.3-3) unstable; urgency=medium
+
+  [ Stefano Rivera ]
+  * Update control.in for the changes in 3.13.3-2.
+  * Replace no-wheel-whl.diff with upstream version.
+  * Patch: Use shutil.which() in missing_compiler_executable().
+
+  [ Matthias Klose ]
+  * Update VCS attributes.
+  * Update to the 3.13 branch 2025-05-20.
+  * Remove patches applied upstream.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 20 May 2025 08:57:58 +0200
+
 python3.13 (3.13.3-2) unstable; urgency=medium
 
   * Drop depends and test depends on python3-wheel-whl, setuptools has native
