@@ -40,7 +40,7 @@ Forwarded: not-needed
 +
  
  __all__ = ["version", "bootstrap"]
- _PIP_VERSION = "25.0.1"
+ _PIP_VERSION = "25.1.1"
 @@ -130,6 +158,11 @@ def _bootstrap(*, root=None, upgrade=Fal
  
      Note that calling this function will alter both sys.path and os.environ.

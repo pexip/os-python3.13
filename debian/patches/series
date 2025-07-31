@@ -23,11 +23,11 @@ min-pyrepl-import.dff
 makefile-bootstrap.diff
 test-freeze-strip-libdir.diff
 stable-abi-multiarch.diff
-m68k-alignment-fix.diff
+gchead-alignment.diff
 issue127330.diff
 no-sphinx-8.2.diff
-man-page-fixes.diff
-no-wheel-whl.diff
+Add-Debian-specific-documentation-path-to-IDLE-menu.diff
+revert-logger-disable.diff
 pexip-md5-security.patch
 pexip-openssl3-deprecations.diff
 pexip_native-md5.diff

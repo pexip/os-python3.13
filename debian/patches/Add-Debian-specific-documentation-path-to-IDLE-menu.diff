@@ -1,0 +1,31 @@
+From: YOKOTA Hiroshi <yokota.hgml@gmail.com>
+Date: Sat, 19 Nov 2022 17:09:56 +0900
+Subject: Add Debian specific documentation path to IDLE menu
+
+Forwarded: not-needed
+
+---
+ Lib/idlelib/editor.py |   10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+Index: b/Lib/idlelib/editor.py
+===================================================================
+--- a/Lib/idlelib/editor.py
++++ b/Lib/idlelib/editor.py
+@@ -80,7 +80,15 @@ class EditorWindow:
+             if sys.platform.count('linux'):
+                 # look for html docs in a couple of standard places
+                 pyver = 'python-docs-' + '%s.%s.%s' % sys.version_info[:3]
+-                if os.path.isdir('/var/www/html/python/'):  # "python2" rpm
++
++                # Debian specfic documentation path
++                deb_pyver    = 'python' + '%s.%s' % sys.version_info[:2]
++                deb_basepath = os.path.join('/usr/share/doc/', deb_pyver,
++                                            'html')
++
++                if os.path.isdir(deb_basepath):
++                    dochome = os.path.join(deb_basepath, 'index.html')
++                elif os.path.isdir('/var/www/html/python/'):  # "python2" rpm
+                     dochome = '/var/www/html/python/index.html'
+                 else:
+                     basepath = '/usr/share/doc/'  # standard location
