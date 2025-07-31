@@ -1,3 +1,9 @@
+python3.13 (3.13.5-2+pexip25u1) pexip-trixie; urgency=medium
+
+  * New upstream release
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Thu, 31 Jul 2025 14:41:40 +0100
+
 python3.13 (3.13.5-2) unstable; urgency=medium
 
   * Patch: Revert disabling of logger while handling log record.
