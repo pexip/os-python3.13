@@ -1,6 +1,6 @@
---- python3.13.orig/Lib/test/test_hashlib.py
-+++ python3.13/Lib/test/test_hashlib.py
-@@ -146,7 +146,8 @@ class HashLibTestCase(unittest.TestCase)
+--- a/Lib/test/test_hashlib.py
++++ b/Lib/test/test_hashlib.py
+@@ -151,7 +151,8 @@
          if _hashlib:
              # These algorithms should always be present when this module
              # is compiled.  If not, something was compiled wrong.
@@ -10,9 +10,9 @@
              self.assertTrue(hasattr(_hashlib, 'openssl_sha1'))
              for algorithm, constructors in self.constructors_to_test.items():
                  constructor = getattr(_hashlib, 'openssl_'+algorithm, None)
---- python3.13.orig/Modules/_hashopenssl.c
-+++ python3.13/Modules/_hashopenssl.c
-@@ -100,7 +100,6 @@ typedef struct {
+--- a/Modules/_hashopenssl.c
++++ b/Modules/_hashopenssl.c
+@@ -100,7 +100,6 @@
  } py_hashentry_t;
  
  // Fundamental to TLS, assumed always present in any libcrypto:
@@ -20,7 +20,7 @@
  #define Py_hash_sha1 "sha1"
  #define Py_hash_sha224 "sha224"
  #define Py_hash_sha256 "sha256"
-@@ -143,8 +142,6 @@ typedef struct {
+@@ -143,8 +142,6 @@
      {py_name, py_alias, ossl_name, ossl_nid, 0, NULL, NULL}
  
  static const py_hashentry_t py_hashes[] = {
@@ -29,34 +29,35 @@
      /* sha1 */
      PY_HASH_ENTRY(Py_hash_sha1, "SHA1", SN_sha1, NID_sha1),
      /* sha2 family */
-@@ -1069,26 +1066,6 @@ EVP_new_impl(PyObject *module, PyObject
+@@ -1073,27 +1070,6 @@
  
  
  /*[clinic input]
 -_hashlib.openssl_md5
 -
--    string as data_obj: object(py_default="b''") = NULL
+-    data: object(c_default="NULL") = b''
 -    *
 -    usedforsecurity: bool = True
+-    string: object(c_default="NULL") = None
 -
 -Returns a md5 hash object; optionally initialized with a string
 -
 -[clinic start generated code]*/
 -
 -static PyObject *
--_hashlib_openssl_md5_impl(PyObject *module, PyObject *data_obj,
--                          int usedforsecurity)
--/*[clinic end generated code: output=87b0186440a44f8c input=990e36d5e689b16e]*/
+-_hashlib_openssl_md5_impl(PyObject *module, PyObject *data,
+-                          int usedforsecurity, PyObject *string)
+-/*[clinic end generated code: output=ca8cf184d90f7432 input=e7c0adbd6a867db1]*/
 -{
--    return py_evp_fromname(module, Py_hash_md5, data_obj, 0);
+-    CALL_HASHLIB_NEW(module, Py_hash_md5, data, string, usedforsecurity);
 -}
 -
 -
 -/*[clinic input]
  _hashlib.openssl_sha1
  
-     string as data_obj: object(py_default="b''") = NULL
-@@ -2187,7 +2164,6 @@ static struct PyMethodDef EVP_functions[
+     data: object(c_default="NULL") = b''
+@@ -2205,7 +2181,6 @@
      _HASHLIB_COMPARE_DIGEST_METHODDEF
      _HASHLIB_HMAC_SINGLESHOT_METHODDEF
      _HASHLIB_HMAC_NEW_METHODDEF

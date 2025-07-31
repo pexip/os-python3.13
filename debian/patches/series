@@ -28,7 +28,6 @@ issue127330.diff
 no-sphinx-8.2.diff
 Add-Debian-specific-documentation-path-to-IDLE-menu.diff
 revert-logger-disable.diff
-pexip-md5-security.patch
 pexip-openssl3-deprecations.diff
 pexip_native-md5.diff
 pexip-json.diff
