@@ -4,7 +4,7 @@ import sys
 site.addsitedir('/opt/pexip/lib/python{}.{}/site-packages'.format(*sys.version_info[:2]))
 
 try:
-    from pexplatform.sitecustomize import install_handlers
+    from pexproduct.sitecustomize import install_handlers
 except ImportError:
     pass
 else:
