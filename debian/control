@@ -7,7 +7,7 @@ XSBC-Pexip-Original-Uploaders: Stefano Rivera <stefanor@debian.org>
 Build-Depends: debhelper (>= 11), dpkg-dev (>= 1.17.11),
   quilt, autoconf,
   lsb-release, sharutils,
-  libreadline-dev | libeditreadline-dev, libncurses-dev, 
+  libeditreadline-dev, libncurses-dev, 
   zlib1g-dev, libbz2-dev, liblzma-dev,
   libgdbm-dev, libdb-dev,
   tk-dev, blt-dev (>= 2.4z),
