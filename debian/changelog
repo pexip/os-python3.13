@@ -1,3 +1,9 @@
+python3.13 (3.13.5-2+pexip25u5) pexip-trixie; urgency=medium
+
+  * Rebuild again to move to main.
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Mon, 09 Mar 2026 23:19:52 +0000
+
 python3.13 (3.13.5-2+pexip25u4) pexip-trixie; urgency=medium
 
   * Change readline module to use libedit instead of libreadline
