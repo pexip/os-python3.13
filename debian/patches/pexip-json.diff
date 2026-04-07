@@ -1,3 +1,4 @@
+Make the json decoder tolerant of bare unicode surrogates
 diff --git a/Lib/json/__init__.py b/Lib/json/__init__.py
 index ed2c747..547a4fd 100644
 --- a/Lib/json/__init__.py
