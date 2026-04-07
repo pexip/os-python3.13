@@ -1,3 +1,5 @@
+Use the native MD5 implementation as we remove it from openssl.
+
 --- a/Lib/test/test_hashlib.py
 +++ b/Lib/test/test_hashlib.py
 @@ -151,7 +151,8 @@
