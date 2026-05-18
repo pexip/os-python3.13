@@ -1,3 +1,33 @@
+python3.13 (3.13.5-2+deb13u2) trixie; urgency=medium
+
+  * CVE-2026-3446
+  * CVE-2026-4224
+  * CVE-2026-3644
+  * CVE-2026-4519
+  * CVE-2026-6019 (Closes: #1135116)
+  * CVE-2026-6100
+
+ -- Moritz Mühlenhoff <jmm@debian.org>  Tue, 05 May 2026 23:05:52 +0200
+
+python3.13 (3.13.5-2+deb13u1) trixie; urgency=medium
+
+  * CVE-2025-11468 (Closes: #1126787)
+  * CVE-2025-12084
+  * CVE-2025-13462
+  * CVE-2025-13836
+  * CVE-2025-13837
+  * CVE-2025-6069
+  * CVE-2025-6075
+  * CVE-2025-8194 (Closes: #1124764)
+  * CVE-2025-8291
+  * CVE-2025-15282 (Closes: #1126780)
+  * CVE-2026-0672 (Closes: #1126762)
+  * CVE-2026-0865 (Closes: #1126740)
+  * CVE-2026-1299 (Closes: #1126745)
+  * CVE-2026-2297
+
+ -- Moritz Mühlenhoff <jmm@debian.org>  Mon, 06 Apr 2026 14:24:14 +0200
+
 python3.13 (3.13.5-2+pexip25u5) pexip-trixie; urgency=medium
 
   * Rebuild again to move to main.
