@@ -1,0 +1,112 @@
+From 9c3d20fbaa0bd9f058862a9a70e912a41cc25fae Mon Sep 17 00:00:00 2001
+From: Huw Jones <huw@pexip.com>
+Date: Thu, 28 May 2026 15:55:19 +0100
+Subject: [PATCH] Modules/_ssl: add SSLContext.set_signature_algorithms
+
+---
+ Modules/_ssl.c          | 25 +++++++++++++++++++++++++
+ Modules/clinic/_ssl.c.h | 41 ++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 65 insertions(+), 1 deletion(-)
+
+diff --git a/Modules/_ssl.c b/Modules/_ssl.c
+index aa846f68641..8f4862a08c2 100644
+--- a/Modules/_ssl.c
++++ b/Modules/_ssl.c
+@@ -3365,6 +3365,30 @@ _ssl__SSLContext_get_ciphers_impl(PySSLContext *self)
+ 
+ }
+ 
++/*[clinic input]
++@critical_section
++_ssl._SSLContext.set_signature_algorithms
++    algorithms: str
++    /
++[clinic start generated code]*/
++
++static PyObject *
++_ssl__SSLContext_set_signature_algorithms_impl(PySSLContext *self,
++                                               const char *algorithms)
++/*[clinic end generated code: output=d88409809bf645b1 input=c27c6650b568e66c]*/
++{
++    int ret = SSL_CTX_set1_sigalgs_list(self->ctx, algorithms);
++    if (ret == 0) {
++        /* Clearing the error queue is necessary on some OpenSSL versions,
++           otherwise the error will be reported again when another SSL call
++           is done. */
++        ERR_clear_error();
++        PyErr_SetString(get_state_ctx(self)->PySSLErrorObject,
++                        "No algorithms can be selected.");
++        return NULL;
++    }
++    Py_RETURN_NONE;
++}
+ 
+ static int
+ do_protocol_selection(int alpn, unsigned char **out, unsigned char *outlen,
+@@ -5210,6 +5234,7 @@ static struct PyMethodDef context_methods[] = {
+     _SSL__SSLCONTEXT__WRAP_SOCKET_METHODDEF
+     _SSL__SSLCONTEXT__WRAP_BIO_METHODDEF
+     _SSL__SSLCONTEXT_SET_CIPHERS_METHODDEF
++    _SSL__SSLCONTEXT_SET_SIGNATURE_ALGORITHMS_METHODDEF
+     _SSL__SSLCONTEXT__SET_ALPN_PROTOCOLS_METHODDEF
+     _SSL__SSLCONTEXT_LOAD_CERT_CHAIN_METHODDEF
+     _SSL__SSLCONTEXT_LOAD_DH_PARAMS_METHODDEF
+diff --git a/Modules/clinic/_ssl.c.h b/Modules/clinic/_ssl.c.h
+index 7c1ea6ad179..b35bdfe33d0 100644
+--- a/Modules/clinic/_ssl.c.h
++++ b/Modules/clinic/_ssl.c.h
+@@ -856,6 +856,45 @@ _ssl__SSLContext_get_ciphers(PySSLContext *self, PyObject *Py_UNUSED(ignored))
+     return return_value;
+ }
+ 
++PyDoc_STRVAR(_ssl__SSLContext_set_signature_algorithms__doc__,
++"set_signature_algorithms($self, algorithms, /)\n"
++"--\n"
++"\n");
++
++#define _SSL__SSLCONTEXT_SET_SIGNATURE_ALGORITHMS_METHODDEF    \
++    {"set_signature_algorithms", (PyCFunction)_ssl__SSLContext_set_signature_algorithms, METH_O, _ssl__SSLContext_set_signature_algorithms__doc__},
++
++static PyObject *
++_ssl__SSLContext_set_signature_algorithms_impl(PySSLContext *self,
++                                               const char *algorithms);
++
++static PyObject *
++_ssl__SSLContext_set_signature_algorithms(PySSLContext *self, PyObject *arg)
++{
++    PyObject *return_value = NULL;
++    const char *algorithms;
++
++    if (!PyUnicode_Check(arg)) {
++        _PyArg_BadArgument("set_signature_algorithms", "argument", "str", arg);
++        goto exit;
++    }
++    Py_ssize_t algorithms_length;
++    algorithms = PyUnicode_AsUTF8AndSize(arg, &algorithms_length);
++    if (algorithms == NULL) {
++        goto exit;
++    }
++    if (strlen(algorithms) != (size_t)algorithms_length) {
++        PyErr_SetString(PyExc_ValueError, "embedded null character");
++        goto exit;
++    }
++    Py_BEGIN_CRITICAL_SECTION(self);
++    return_value = _ssl__SSLContext_set_signature_algorithms_impl(self, algorithms);
++    Py_END_CRITICAL_SECTION();
++
++exit:
++    return return_value;
++}
++
+ PyDoc_STRVAR(_ssl__SSLContext__set_alpn_protocols__doc__,
+ "_set_alpn_protocols($self, protos, /)\n"
+ "--\n"
+@@ -2867,4 +2906,4 @@ exit:
+ #ifndef _SSL_ENUM_CRLS_METHODDEF
+     #define _SSL_ENUM_CRLS_METHODDEF
+ #endif /* !defined(_SSL_ENUM_CRLS_METHODDEF) */
+-/*[clinic end generated code: output=8c4a1e44702afeb7 input=a9049054013a1b77]*/
++/*[clinic end generated code: output=ad9fba8e0cac74c7 input=a9049054013a1b77]*/
+-- 
+2.53.0
+

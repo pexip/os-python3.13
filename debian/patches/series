@@ -51,3 +51,4 @@ CVE-2026-6100.patch
 pexip-openssl3-deprecations.diff
 pexip_native-md5.diff
 pexip-json.diff
+pexip-SSLContext.set_signature_algorithms.patch
