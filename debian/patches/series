@@ -51,6 +51,7 @@ CVE-2026-6019-2.patch
 CVE-2026-6100.patch
 ssl-sni-crash.patch
 ssl-reference-leak.patch
+dict-use-after-free.patch
 traverse-managed-dicts.patch
 CVE-2026-1502.patch
 CVE-2026-3276.patch
