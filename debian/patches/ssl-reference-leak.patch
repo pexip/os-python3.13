@@ -1,0 +1,198 @@
+From e102378eca912df8f51c0f2ede75ff3b44248dac Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?B=C3=A9n=C3=A9dikt=20Tran?=
+ <10796600+picnixz@users.noreply.github.com>
+Date: Sun, 24 May 2026 11:43:03 +0200
+Subject: [PATCH] [3.13] gh-142516: fix reference leaks in `ssl.SSLContext`
+ objects (GH-143685) (GH-145075) (#148371)
+
+Cherry picked from commits 3a2a686cc45de2fb685ff332b7b914f27f660680
+and 1decc7ee20cf6dce61e07cd8463ed87c1eb5fcd7 with minor amendments.
+---
+ Lib/test/test_ssl.py                          | 60 +++++++++++++++++--
+ ...-01-11-13-03-32.gh-issue-142516.u7An-s.rst |  2 +
+ Modules/_ssl.c                                | 18 ++++--
+ 3 files changed, 70 insertions(+), 10 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Library/2026-01-11-13-03-32.gh-issue-142516.u7An-s.rst
+
+--- a/Lib/test/test_ssl.py
++++ b/Lib/test/test_ssl.py
+@@ -52,6 +52,16 @@
+ IS_OPENSSL_3_0_0 = ssl.OPENSSL_VERSION_INFO >= (3, 0, 0)
+ PY_SSL_DEFAULT_CIPHERS = sysconfig.get_config_var('PY_SSL_DEFAULT_CIPHERS')
+ 
++HAS_KEYLOG = hasattr(ssl.SSLContext, 'keylog_filename')
++requires_keylog = unittest.skipUnless(
++    HAS_KEYLOG, 'test requires OpenSSL 1.1.1 with keylog callback')
++CAN_SET_KEYLOG = HAS_KEYLOG and os.name != "nt"
++requires_keylog_setter = unittest.skipUnless(
++    CAN_SET_KEYLOG,
++    "cannot set 'keylog_filename' on Windows"
++)
++
++
+ PROTOCOL_TO_TLS_VERSION = {}
+ for proto, ver in (
+     ("PROTOCOL_SSLv3", "SSLv3"),
+@@ -295,24 +305,35 @@
+     cert_reqs=ssl.CERT_NONE,
+     ca_certs=None, certfile=None, keyfile=None,
+     ciphers=None,
++    min_version=None, max_version=None,
+ ):
+     if server_side:
+         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+     else:
+         context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
++
+     if check_hostname is None:
+         if cert_reqs == ssl.CERT_NONE:
+             context.check_hostname = False
+     else:
+         context.check_hostname = check_hostname
++
+     if cert_reqs is not None:
+         context.verify_mode = cert_reqs
++
+     if ca_certs is not None:
+         context.load_verify_locations(ca_certs)
+     if certfile is not None or keyfile is not None:
+         context.load_cert_chain(certfile, keyfile)
++
+     if ciphers is not None:
+         context.set_ciphers(ciphers)
++
++    if min_version is not None:
++        context.minimum_version = min_version
++    if max_version is not None:
++        context.maximum_version = max_version
++
+     return context
+ 
+ 
+@@ -324,6 +345,7 @@
+     cert_reqs=ssl.CERT_NONE,
+     ca_certs=None, certfile=None, keyfile=None,
+     ciphers=None,
++    min_version=None, max_version=None,
+     **kwargs,
+ ):
+     context = make_test_context(
+@@ -332,6 +354,7 @@
+         cert_reqs=cert_reqs,
+         ca_certs=ca_certs, certfile=certfile, keyfile=keyfile,
+         ciphers=ciphers,
++        min_version=min_version, max_version=max_version,
+     )
+     if not server_side:
+         kwargs.setdefault("server_hostname", SIGNED_CERTFILE_HOSTNAME)
+@@ -1756,6 +1779,39 @@
+         with self.assertRaises(ValueError):
+             ctx.num_tickets = 1
+ 
++    @support.cpython_only
++    def test_refcycle_msg_callback(self):
++        # See https://github.com/python/cpython/issues/142516.
++        ctx = make_test_context()
++        def msg_callback(*args, _=ctx, **kwargs): ...
++        ctx._msg_callback = msg_callback
++
++    @support.cpython_only
++    @requires_keylog_setter
++    def test_refcycle_keylog_filename(self):
++        # See https://github.com/python/cpython/issues/142516.
++        self.addCleanup(os_helper.unlink, os_helper.TESTFN)
++        ctx = make_test_context()
++        class KeylogFilename(str): ...
++        ctx.keylog_filename = KeylogFilename(os_helper.TESTFN)
++        ctx.keylog_filename._ = ctx
++
++    @support.cpython_only
++    @unittest.skipUnless(ssl.HAS_PSK, 'requires TLS-PSK')
++    def test_refcycle_psk_client_callback(self):
++        # See https://github.com/python/cpython/issues/142516.
++        ctx = make_test_context()
++        def psk_client_callback(*args, _=ctx, **kwargs): ...
++        ctx.set_psk_client_callback(psk_client_callback)
++
++    @support.cpython_only
++    @unittest.skipUnless(ssl.HAS_PSK, 'requires TLS-PSK')
++    def test_refcycle_psk_server_callback(self):
++        # See https://github.com/python/cpython/issues/142516.
++        ctx = make_test_context(server_side=True)
++        def psk_server_callback(*args, _=ctx, **kwargs): ...
++        ctx.set_psk_server_callback(psk_server_callback)
++
+ 
+ class SSLErrorTests(unittest.TestCase):
+ 
+@@ -4967,10 +5023,6 @@
+                 self.assertEqual(res, b'\x02\n')
+ 
+ 
+-HAS_KEYLOG = hasattr(ssl.SSLContext, 'keylog_filename')
+-requires_keylog = unittest.skipUnless(
+-    HAS_KEYLOG, 'test requires OpenSSL 1.1.1 with keylog callback')
+-
+ class TestSSLDebug(unittest.TestCase):
+ 
+     def keylog_lines(self, fname=os_helper.TESTFN):
+--- /dev/null
++++ b/Misc/NEWS.d/next/Library/2026-01-11-13-03-32.gh-issue-142516.u7An-s.rst
+@@ -0,0 +1,2 @@
++:mod:`ssl`: fix reference leaks in :class:`ssl.SSLContext` objects. Patch by
++Bénédikt Tran.
+--- a/Modules/_ssl.c
++++ b/Modules/_ssl.c
+@@ -297,7 +297,7 @@
+     int post_handshake_auth;
+ #endif
+     PyObject *msg_cb;
+-    PyObject *keylog_filename;
++    PyObject *keylog_filename;  // can be anything accepted by Py_fopen()
+     BIO *keylog_bio;
+     /* Cached module state, also used in SSLSocket and SSLSession code. */
+     _sslmodulestate *state;
+@@ -322,7 +322,7 @@
+     PySSLContext *ctx; /* weakref to SSL context */
+     char shutdown_seen_zero;
+     enum py_ssl_server_or_client socket_type;
+-    PyObject *owner; /* Python level "owner" passed to servername callback */
++    PyObject *owner; /* weakref to Python level "owner" passed to servername callback */
+     PyObject *server_hostname;
+     _PySSLError err; /* last seen error from various sources */
+     /* Some SSL callbacks don't have error reporting. Callback wrappers
+@@ -2290,6 +2290,10 @@
+ static int
+ PySSL_clear(PySSLSocket *self)
+ {
++    Py_CLEAR(self->Socket);
++    Py_CLEAR(self->ctx);
++    Py_CLEAR(self->owner);
++    Py_CLEAR(self->server_hostname);
+     Py_CLEAR(self->exc);
+     return 0;
+ }
+@@ -2313,10 +2317,7 @@
+         SSL_set_shutdown(self->ssl, SSL_SENT_SHUTDOWN | SSL_get_shutdown(self->ssl));
+         SSL_free(self->ssl);
+     }
+-    Py_XDECREF(self->Socket);
+-    Py_XDECREF(self->ctx);
+-    Py_XDECREF(self->server_hostname);
+-    Py_XDECREF(self->owner);
++    (void)PySSL_clear(self);
+     PyObject_GC_Del(self);
+     Py_DECREF(tp);
+ }
+@@ -3245,6 +3246,11 @@
+ {
+     Py_VISIT(self->set_sni_cb);
+     Py_VISIT(self->msg_cb);
++    Py_VISIT(self->keylog_filename);
++#ifndef OPENSSL_NO_PSK
++    Py_VISIT(self->psk_client_callback);
++    Py_VISIT(self->psk_server_callback);
++#endif
+     Py_VISIT(Py_TYPE(self));
+     return 0;
+ }
