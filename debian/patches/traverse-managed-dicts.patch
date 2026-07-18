@@ -50,7 +50,7 @@ Origin: upstream, https://github.com/python/cpython/pull/145440
 +overwritten at runtime.
 --- a/Objects/dictobject.c
 +++ b/Objects/dictobject.c
-@@ -4553,10 +4553,8 @@
+@@ -4566,10 +4566,8 @@
  
      if (DK_IS_UNICODE(keys)) {
          if (_PyDict_HasSplitTable(mp)) {
@@ -63,7 +63,7 @@ Origin: upstream, https://github.com/python/cpython/pull/145440
              }
          }
          else {
-@@ -7121,16 +7119,21 @@
+@@ -7134,16 +7132,21 @@
      if((tp->tp_flags & Py_TPFLAGS_MANAGED_DICT) == 0) {
          return 0;
      }

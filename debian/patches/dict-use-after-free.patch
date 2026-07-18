@@ -1,0 +1,143 @@
+From d567f451e157e241533ec4109fadd29301576060 Mon Sep 17 00:00:00 2001
+From: Sam Gross <colesbury@gmail.com>
+Date: Mon, 2 Mar 2026 13:59:52 -0500
+Subject: [PATCH] [3.13] gh-130555: Fix use-after-free in dict.clear() with
+ embedded values (gh-145268) (#145430)
+
+---
+ Lib/test/test_dict.py                         | 63 +++++++++++++++++++
+ ...-02-26-12-00-00.gh-issue-130555.TMSOIu.rst |  3 +
+ Objects/dictobject.c                          | 31 ++++++---
+ 3 files changed, 88 insertions(+), 9 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Core_and_Builtins/2026-02-26-12-00-00.gh-issue-130555.TMSOIu.rst
+
+--- a/Lib/test/test_dict.py
++++ b/Lib/test/test_dict.py
+@@ -1664,6 +1664,69 @@
+ class SubclassMappingTests(mapping_tests.BasicTestMappingProtocol):
+     type2test = Dict
+ 
++    def test_clear_reentrant_embedded(self):
++        # gh-130555: dict.clear() must be safe when values are embedded
++        # in an object and a destructor mutates the dict.
++        class MyObj: pass
++        class ClearOnDelete:
++            def __del__(self):
++                nonlocal x
++                del x
++
++        x = MyObj()
++        x.a = ClearOnDelete()
++
++        d = x.__dict__
++        d.clear()
++
++    def test_clear_reentrant_cycle(self):
++        # gh-130555: dict.clear() must be safe for embedded dicts when the
++        # object is part of a reference cycle and the last reference to the
++        # dict is via the cycle.
++        class MyObj: pass
++        obj = MyObj()
++        obj.f = obj
++        obj.attr = "attr"
++
++        d = obj.__dict__
++        del obj
++
++        d.clear()
++
++    def test_clear_reentrant_force_combined(self):
++        # gh-130555: dict.clear() must be safe when a destructor forces the
++        # dict from embedded/split to combined (setting ma_values to NULL).
++        class MyObj: pass
++        class ForceConvert:
++            def __del__(self):
++                d[1] = "trigger"
++
++        x = MyObj()
++        x.a = ForceConvert()
++        x.b = "other"
++
++        d = x.__dict__
++        d.clear()
++
++    def test_clear_reentrant_delete(self):
++        # gh-130555: dict.clear() must be safe when a destructor deletes
++        # a key from the same embedded dict.
++        class MyObj: pass
++        class DelKey:
++            def __del__(self):
++                try:
++                    del d['b']
++                except KeyError:
++                    pass
++
++        x = MyObj()
++        x.a = DelKey()
++        x.b = "value_b"
++        x.c = "value_c"
++
++        d = x.__dict__
++        d.clear()
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
+--- /dev/null
++++ b/Misc/NEWS.d/next/Core_and_Builtins/2026-02-26-12-00-00.gh-issue-130555.TMSOIu.rst
+@@ -0,0 +1,3 @@
++Fix use-after-free in :meth:`dict.clear` when the dictionary values are
++embedded in an object and a destructor causes re-entrant mutation of the
++dictionary.
+--- a/Objects/dictobject.c
++++ b/Objects/dictobject.c
+@@ -2794,6 +2794,21 @@
+ }
+ 
+ static void
++clear_embedded_values(PyDictValues *values, Py_ssize_t nentries)
++{
++    PyObject *refs[SHARED_KEYS_MAX_SIZE];
++    assert(nentries <= SHARED_KEYS_MAX_SIZE);
++    for (Py_ssize_t i = 0; i < nentries; i++) {
++        refs[i] = values->values[i];
++        values->values[i] = NULL;
++    }
++    values->size = 0;
++    for (Py_ssize_t i = 0; i < nentries; i++) {
++        Py_XDECREF(refs[i]);
++    }
++}
++
++static void
+ clear_lock_held(PyObject *op)
+ {
+     PyDictObject *mp;
+@@ -2824,20 +2839,18 @@
+         assert(oldkeys->dk_refcnt == 1);
+         dictkeys_decref(interp, oldkeys, IS_DICT_SHARED(mp));
+     }
++    else if (oldvalues->embedded) {
++        clear_embedded_values(oldvalues, oldkeys->dk_nentries);
++    }
+     else {
++        set_values(mp, NULL);
++        set_keys(mp, Py_EMPTY_KEYS);
+         n = oldkeys->dk_nentries;
+         for (i = 0; i < n; i++) {
+             Py_CLEAR(oldvalues->values[i]);
+         }
+-        if (oldvalues->embedded) {
+-            oldvalues->size = 0;
+-        }
+-        else {
+-            set_values(mp, NULL);
+-            set_keys(mp, Py_EMPTY_KEYS);
+-            free_values(oldvalues, IS_DICT_SHARED(mp));
+-            dictkeys_decref(interp, oldkeys, false);
+-        }
++        free_values(oldvalues, IS_DICT_SHARED(mp));
++        dictkeys_decref(interp, oldkeys, false);
+     }
+     ASSERT_CONSISTENT(mp);
+ }
